@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>9x16 Clicker Game</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      background: black;
+      color: white;
+      font-family: Arial, sans-serif;
+    }
+    .game-wrapper {
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .game-container {
+      position: relative;
+      width: calc(100vh * 9 / 16);
+      height: 100vh;
+      background: black;
+      overflow: hidden;
+    }
+    .top-bar {
+      display: flex;
+      justify-content: space-around;
+      padding: 10px;
+    }
+    .top-bar div {
+      background: #333;
+      padding: 5px 10px;
+      border-radius: 10px;
+    }
+    .tab-buttons {
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+      display: flex;
+      justify-content: space-around;
+      background: #111;
+      padding: 10px 0;
+    }
+    .tab-buttons img {
+      width: 40px;
+      height: 40px;
+      cursor: pointer;
+    }
+    .screen {
+      display: none;
+      padding: 20px;
+    }
+    .active {
+      display: block;
+    }
+    .pepe {
+      display: block;
+      margin: 40px auto;
+      width: 100px;
+      cursor: pointer;
+    }
+    .energy-bar {
+      position: absolute;
+      top: 100px;
+      right: 10px;
+      width: 20px;
+      height: 300px;
+      background: #444;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    .energy-fill {
+      background: orange;
+      width: 100%;
+      position: absolute;
+      bottom: 0;
+    }
+    .reward-text {
+      position: absolute;
+      color: yellow;
+      font-size: 14px;
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="game-wrapper">
+    <div class="game-container">
+      <div class="top-bar">
+        <div id="level">Level 1</div>
+        <div id="stars">0 ⭐</div>
+        <div id="referrals">0 👥</div>
+      </div>
+
+      <div id="main" class="screen active">
+        <img src="pepe.png" class="pepe" onclick="tapPepe(event)" />
+        <div class="energy-bar">
+          <div id="energy-fill" class="energy-fill" style="height: 100%;"></div>
+        </div>
+        <img src="telegram.png" style="position:absolute;top:60px;left:10px;width:50px;cursor:pointer" onclick="window.open('https://t.me/fancynftchanel', '_blank')" />
+        <img src="gift.png" style="position:absolute;top:130px;left:10px;width:50px;cursor:pointer" onclick="redeemCode()" />
+      </div>
+
+      <div id="referrals-tab" class="screen">
+        <h2>Referrals</h2>
+        <p>⭐For each invited user you get 5 stars⭐</p>
+        <ul id="referral-list"></ul>
+      </div>
+
+      <div id="quests-tab" class="screen">
+        <h2>Quests</h2>
+        <div onclick="claimQuest('subscribe', 10)">Subscribe to channel (10⭐)</div>
+        <div onclick="claimQuest('invite10', 50)">Invite 10 users (50⭐)</div>
+      </div>
+
+      <div class="tab-buttons">
+        <img src="bag.png" onclick="switchTab('main')" />
+        <img src="referrals.png" onclick="switchTab('referrals-tab')" />
+        <img src="house.png" onclick="switchTab('main')" />
+        <img src="quests.png" onclick="switchTab('quests-tab')" />
+        <img src="store.png" onclick="switchTab('main')" />
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let stars = 0;
+    let energy = 10000;
+
+    function updateStats() {
+      document.getElementById('stars').innerText = stars.toFixed(4) + ' ⭐';
+      const energyFill = document.getElementById('energy-fill');
+      energyFill.style.height = (energy / 10000 * 100) + '%';
+    }
+
+    function tapPepe(e) {
+      if (energy <= 0) return;
+      const reward = 0.0001;
+      stars += reward;
+      energy--;
+      updateStats();
+
+      const txt = document.createElement('div');
+      txt.className = 'reward-text';
+      txt.innerText = `+${reward.toFixed(4)}⭐`;
+      txt.style.left = (e.clientX - 30) + 'px';
+      txt.style.top = (e.clientY - 30) + 'px';
+      document.body.appendChild(txt);
+      setTimeout(() => txt.remove(), 1000);
+    }
+
+    function switchTab(tab) {
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      document.getElementById(tab).classList.add('active');
+    }
+
+    function redeemCode() {
+      const code = prompt('Enter code:');
+      if (code === 'TEST') {
+        stars += 5;
+        alert('Code redeemed! +5⭐');
+        updateStats();
+      } else {
+        alert('Invalid code');
+      }
+    }
+
+    function claimQuest(type, reward) {
+      stars += reward;
+      alert(`Quest completed! +${reward}⭐`);
+      updateStats();
+    }
+
+    function tickEnergy() {
+      if (energy < 10000) {
+        energy++;
+        updateStats();
+      }
+    }
+
+    setInterval(tickEnergy, 2000); // +1 energy every 2 seconds
+    updateStats();
+  </script>
+</body>
+</html>
